@@ -1,101 +1,101 @@
 ---
 name: writing-style-optimization
-description: 用于任何以自然语言文本为主要交付物的任务，包括回答、解释、分析、讨论、建议、报告、文档、起草、重写和审校。通过任务识别与 External Work 交接、依赖结构重建、Writing Style Selection 和 Prose Rewrite 管理完整输出流程，并保留事实、scope、hedges、attribution、inference boundary 与技术术语。主要交付物为代码、配置、公式或结构化数据时不使用；其中附带的自然语言说明仍适用。
+description: Applies to any task whose primary deliverable is natural-language text, including answers, explanations, analyses, discussions, recommendations, reports, documentation, drafting, rewriting, and editing. Manages the complete output workflow through task identification and External Work handoff, dependency-structure reconstruction, Writing Style Selection, and Prose Rewrite, while preserving facts, scope, hedges, attribution, inference boundaries, and technical terminology. Do not use when the primary deliverable is code, configuration, formulas, or structured data; accompanying natural-language explanations remain in scope.
 ---
 # Writing Style Optimization
 
-## 范围
+## Scope
 
-本 Skill 用于管理自然语言输出的完整流程，包括任务识别、信息交接、结构重建、写作方式选择和 prose realization。本 Skill 不直接执行检索、计算或推理，只在文档中规定这些工作的输入、输出与交接接口；具体工作交由 External Agents / Tools 执行。
+This Skill manages the complete workflow for natural-language output, including task identification, information handoff, structure reconstruction, writing approach selection, and prose realization. This Skill does not directly perform retrieval, calculation, or reasoning; it only specifies the input, output, and handoff interfaces for this work in its documentation. The actual work is performed by External Agents / Tools.
 
-## 核心约束
+## Core Constraints
 
-- 以 Requested Objectives 为全流程主线。Derived Work Items、Work Results、Semantic Units 和 Deliverables 均围绕 Objectives 重新组织；阶段之间传递内容及其必要 links，各类对象之间不要求固定的一一对应关系。
-- 严格区分 Task Contract、Raw Material、Dependency Graph、Linearized Structure Draft、Writing Style Map 和 Final Output。每个阶段只修改自己负责的 artifact。
-- External Agents / Tools 产生的 Work Results 经 External Work Gate 检查并整理为 Raw Material 后，后续阶段不得发明其中不存在的事实、主张或推导，不得丢失 scope、hedges、attribution、inference boundary、冲突状态或技术术语。
-- Gate 属于其所检查阶段。Gate Fail 只返回该阶段，不建立跨阶段的常规回退。
-- 严格遵循文档规定的处理顺序；除各阶段 Gate 规定的本地回退外，不跳过、倒置或跨阶段重做。
+- Use Requested Objectives as the organizing axis of the entire workflow. Derived Work Items, Work Results, Semantic Units, and Deliverables are all reorganized around Objectives; stages pass content and its necessary links forward, and no fixed one-to-one correspondence is required among object types.
+- Strictly distinguish the Task Contract, Raw Material, Dependency Graph, Linearized Structure Draft, Writing Style Map, and Final Output. Each stage modifies only the artifact for which it is responsible.
+- After Work Results produced by External Agents / Tools have passed the External Work Gate and been organized into Raw Material, subsequent stages must not invent facts, claims, or inferences absent from it, or lose scope, hedges, attribution, inference boundaries, conflict states, or technical terminology.
+- A Gate belongs to the stage it checks. A Gate Fail returns only to that stage and does not establish routine cross-stage rollback.
+- Strictly follow the processing order specified in the documentation. Apart from the local rollback defined by each stage's Gate, do not skip or invert stages or redo work across stages.
 
-## 控制模型
+## Control Models
 
-使用两种基本处理模型：
+Use two basic processing models:
 
-- **Model I — Direct Pass**：步骤完成产物后直接交给下一步骤，用于不需要本地质量判定的阶段连接或内部转换。
-- **Model II — Gate Check Loop**：步骤产生 artifact 后由本阶段 Gate 检查；Pass 后继续，Fail 则返回本阶段重做。
+- **Model I — Direct Pass**: after a step produces an artifact, it passes the artifact directly to the next step. This model is used for stage connections or internal transformations that do not require a local quality decision.
+- **Model II — Gate Check Loop**: after a step produces an artifact, the Gate for that stage checks it. Pass continues the workflow; Fail returns to that stage for another attempt.
 
-External Work、Structure、Writing Style Selection 和 Prose 使用 Model II；其余连接使用 Model I。
+External Work, Structure, Writing Style Selection, and Prose use Model II. All other connections use Model I.
 
-## 工作流与文件加载
+## Workflow and File Loading
 
-所有任务都从 Analyze Prompt 开始，并按相同的阶段顺序处理。Supporting file 的加载条件只决定何时读取阶段细则，不决定是否执行该阶段。任务较小时，各阶段可以产生最小或退化形式的 artifact，但不得跳过阶段。
+Every task begins with Analyze Prompt and follows the same stage sequence. The loading condition for a supporting file determines only when the details of a stage are read, not whether the stage is executed. For a small task, each stage may produce a minimal or degenerate artifact, but no stage may be skipped.
 
-1. 开始 Analyze Prompt 时读取 `references/task-and-work.md`。
-2. 得到 Raw Material 后读取 `references/structure.md`。
-3. 建立包含 edges 的 Dependency Graph 时查询 `references/relation-inventory.md`；单一 unit、无 edge 的退化 Graph 不需要查询。
-4. Structure Gate 通过后读取 `references/writing-style-selection.md`。
-5. Writing Style Selection 通过 `references/writing-style-selection.md` 内的 Active Transforms Index 了解可用 transform 的类别、触发特征、适用范围和文件位置；Selection 只在 Writing Style Map 中记录 selected transform 和 override scope，不读取 `transforms/` 正文。
-6. Writing Style Gate 通过后读取 `references/prose.md`；Prose 仅在 Writing Style Map 包含 selected transform 时读取对应的 `transforms/` 文件，并按其规则完成改写。
+1. Read `references/task-and-work.md` when Analyze Prompt begins.
+2. Read `references/structure.md` after Raw Material has been formed.
+3. Consult `references/relation-inventory.md` when building a Dependency Graph that contains edges. A degenerate Graph with a single unit and no edges does not require the Relation Inventory.
+4. Read `references/writing-style-selection.md` after the Structure Gate passes.
+5. Writing Style Selection uses the Active Transforms Index in `references/writing-style-selection.md` to learn the available transform categories, trigger features, applicable scopes, and file locations. Selection records only the selected transform and override scope in the Writing Style Map; it does not read the bodies of files in `transforms/`.
+6. Read `references/prose.md` after the Writing Style Gate passes. Prose reads the corresponding file in `transforms/` only when the Writing Style Map contains a selected transform, and completes the rewrite according to its rules.
 
-所有任务都从 Analyze Prompt 开始，只是中间对象可能很小。例如：
+Every task begins with Analyze Prompt; only the intermediate objects may be small. For example:
 
 ```text
-一个 Objective
-→ 一个 Derived Work Item
-→ 一个 Work Result
-→ 一个 Semantic Unit、零条 edge
-→ 无 transform 的 Writing Style Map
-→ 一段 Final Output
+one Objective
+→ one Derived Work Item
+→ one Work Result
+→ one Semantic Unit, zero edges
+→ a Writing Style Map with no transform
+→ one-paragraph Final Output
 ```
 
-## 工作流
+## Workflow
 
-### 1. Analyze Prompt 与 External Work
+### 1. Analyze Prompt and External Work
 
-Analyze Prompt 是整个流程的起始点。它对用户输入进行任务层分析与拆解，识别最终输出必须完成的内容，并形成 Task Contract。Task Contract 只定义任务及其输入，不定义段落或语义结构，包括：
+Analyze Prompt is the starting point of the entire workflow. It analyzes and decomposes the user input at the task level, identifies what the Final Output must accomplish, and forms the Task Contract. The Task Contract defines only the task and its inputs; it does not define paragraph or semantic structure. It includes:
 
-- **Problem Specification**：Requested Objectives、Derived Work Items、Structure Readiness Conditions、Task Relations、Requirement Routing 与 Deliverables；
-- **Context Specification**：区分任务与参考信息，并通过 Input Inventory 记录输入的 role、authority 和 objective links。
+- **Problem Specification**: Requested Objectives, Derived Work Items, Structure Readiness Conditions, Task Relations, Requirement Routing, and Deliverables;
+- **Context Specification**: distinguishes tasks from reference information and records the role, authority, and objective links of inputs through the Input Inventory.
 
-根据 Derived Work Items、required results、Task Relations、Structure Readiness Conditions 和 Input Inventory 生成 Derived Work Plan，交给 External Agents / Tools 执行。在进入 Structure 前，Work Results 必须经过 External Work Gate。
+Build the Derived Work Plan from the Derived Work Items, required results, Task Relations, Structure Readiness Conditions, and Input Inventory, and give it to External Agents / Tools for execution. Before entering Structure, Work Results must pass through the External Work Gate.
 
-External Work Gate 检查 Coverage、Requirement Compliance、Traceability 和 Sufficiency。通过检查的 Work Results 与达到局部 retry 上限后生成的 Unresolved Work Results 一并整理为 Raw Material；未解决状态被保留，但不中止流程。具体定义、检查顺序和 retry 规则见 `references/task-and-work.md`。
+The External Work Gate checks Coverage, Requirement Compliance, Traceability, and Sufficiency. Work Results that pass the Gate and Unresolved Work Results produced after the local retry limit is reached are organized together into Raw Material. Unresolved states are preserved but do not stop the workflow. See `references/task-and-work.md` for the detailed definitions, check order, and retry rules.
 
 ### 2. Structure
 
-Structure 接收 Raw Material，以及 Task Contract 中面向 Structure 的 Objectives、Task Relations、requirements 和 Deliverable Contracts。
+Structure receives Raw Material and the Objectives, Task Relations, requirements, and Deliverable Contracts in the Task Contract that apply to Structure.
 
-首先依据开放的 Relation Inventory 识别语义关系及 endpoint roles，据此建立 Dependency Graph：
+First, identify semantic relations and endpoint roles using the open Relation Inventory, and build the Dependency Graph from them:
 
 $$
 D=(U,E,\lambda,H),
 $$
 
-其中 $U$ 为 Semantic Units，$E$ 为无类型 edge instances，$\lambda$ 为 edge-labeling function，$H$ 为 hard presentation constraints。找不到合适的既有 relation 时，可以建立只服务于当前 Graph 的 local relation；不得自动把它写回 Relation Inventory。
+where $U$ is the set of Semantic Units, $E$ is the set of untyped edge instances, $\lambda$ is the edge-labeling function, and $H$ is the set of hard presentation constraints. When no suitable existing relation can be found, create a local relation that serves only the current Graph; do not automatically write it back to the Relation Inventory.
 
-随后对 Dependency Graph 进行 Linearization，得到已经由基本通顺语句组成的 Linearized Structure Draft。Linearization 通过顺序、邻接、分组及必要的关系说明实现 Graph 中的重要 relations；Raw Material 的产生顺序不得直接成为 Presentation Order。
+Then linearize the Dependency Graph to obtain a Linearized Structure Draft composed of basically fluent sentences. Linearization realizes important relations in the Graph through order, adjacency, grouping, and necessary relation statements. The production order of Raw Material must not become the Presentation Order directly.
 
-Structure Gate 分别检查 Graph construction 与 Linearization。Graph、unit、edge、label 或 hard constraint 的问题返回 Graph construction；顺序、分组或 Relation Realization 的问题返回 Linearization。具体过程与检查见 `references/structure.md`。
+The Structure Gate checks Graph construction and Linearization separately. Problems with the Graph, units, edges, labels, or hard constraints return to Graph construction; problems with order, grouping, or Relation Realization return to Linearization. See `references/structure.md` for the detailed procedure and checks.
 
 ### 3. Writing Style Selection
 
-Writing Style Selection 负责处理成功通过 Structure Gate 的 Linearized Structure Draft。所有文本本身设定为 Default Style。Writing Style Selection 通过 `references/writing-style-selection.md` 内的 Active Transforms Index 了解可用 transform 的类别、触发特征、适用范围和文件位置，但不读取 `transforms/` 正文。随后为每个 Deliverable 确定 Default Language Profile，并为现有 Unit 或 Unit Group 建立 Writing Style Map，记录 Surface Realization，以及适用时的 local Language Profile override、selected transform 和 override scope。每个 Semantic Unit 使用 Default Style 或恰好一个 selected transform；不同 transforms 只能分配给互不重叠的 scopes。
+Writing Style Selection processes the Linearized Structure Draft that has passed the Structure Gate. All text is assigned Default Style. Writing Style Selection uses the Active Transforms Index in `references/writing-style-selection.md` to learn the available transform categories, trigger features, applicable scopes, and file locations, but does not read the bodies of files in `transforms/`. It then determines a Default Language Profile for each Deliverable and builds a Writing Style Map for existing Units or Unit Groups, recording Surface Realization and, when applicable, a local Language Profile override, selected transform, and override scope. Each Semantic Unit uses Default Style or exactly one selected transform; different transforms may be assigned only to disjoint scopes.
 
-Special Transform 可以对 Default Style 的写作方式进行覆盖。Writing Style Selection 只分配 Special Transform 标签及其 override scope，不执行实际改写。Writing Style Gate 只检查 Style Map。Fail 时重新选择 Language Profile、Surface Realization、transform 或 override scope，不返回 Structure。具体过程、Active Transforms Index 和检查规则见 `references/writing-style-selection.md`。
+A Special Transform may override the writing approach of Default Style. Writing Style Selection only assigns the Special Transform label and its override scope; it does not perform the actual rewrite. The Writing Style Gate checks only the Style Map. On Fail, reselect the Language Profile, Surface Realization, transform, or override scope without returning to Structure. See `references/writing-style-selection.md` for the detailed procedure, Active Transforms Index, and check rules.
 
 ### 4. Prose
 
-Prose 按照通过检查的 Writing Style Map 重写 Linearized Structure Draft。进入本阶段后先读取 `references/prose.md`；仅当 Writing Style Map 包含 selected transform 时，才读取对应的 `transforms/` 文件，并在相应 override scope 内执行其规则。未被 transform 覆盖的部分按照 Default Language Profile 与相应的 Surface Realization 改写。本阶段可以调整措辞、句法、句子边界和表面格式，但不得新增 claim，也不得改变已经确定的 relations、Presentation Order、hard constraints、inference boundary、限定语、hedges 或技术术语。
+Prose rewrites the Linearized Structure Draft according to the checked Writing Style Map. Read `references/prose.md` when entering this stage. Only when the Writing Style Map contains a selected transform, read the corresponding file in `transforms/` and execute its rules within the corresponding override scope. Rewrite content not covered by a transform according to the Default Language Profile and corresponding Surface Realization. This stage may adjust wording, syntax, sentence boundaries, and surface formatting, but it must not add claims or change established relations, Presentation Order, hard constraints, inference boundaries, qualifiers, hedges, or technical terminology.
 
-Prose Gate 检查 Objectives 是否得到完整回应、结构关系是否被正确实现、信息与限定是否保留、术语是否稳定、selected transforms 是否在各自 override scope 内被正确实现，以及文本中是否仍存在无信息铺垫、重复结论、虚假 transition 或 chatbot residue。Transform 的实际文本效果由 Prose Gate 检查，不属于 Writing Style Gate。Fail 只返回 Style-Guided Prose Rewrite；Pass 后输出 Final Output。具体规则见 `references/prose.md`。
+The Prose Gate checks whether Objectives are answered completely, structural relations are realized correctly, information and qualifications are preserved, terminology remains stable, selected transforms are implemented correctly within their respective override scopes, and the text still contains uninformative staging, repeated conclusions, false transitions, or chatbot residue. The actual textual effects of a Transform are checked by the Prose Gate, not the Writing Style Gate. Fail returns only to the Style-Guided Prose Rewrite; Pass produces the Final Output. See `references/prose.md` for the detailed rules.
 
-## 完成条件
+## Completion Conditions
 
-只有同时满足以下条件，才交付 Final Output：
+Deliver the Final Output only when all of the following conditions are satisfied:
 
-- Requested Objectives 已在相应 Deliverables 中得到回应；
-- hard requirements 已满足，未满足的 soft requirements 已服从事实准确性、信息保真或更高优先级要求；
-- Raw Material 中的 unresolved、conflict、scope、hedges 和 attribution 没有被无依据地消除；
-- Dependency Graph 中的重要 relations 和 hard constraints 可以从最终文本恢复；
-- Writing Style Map 没有覆盖 Structure 的决定；
-- Prose Rewrite 没有新增内容主张或破坏术语与限定；
-- 输出形式与真实逻辑复杂度相称，没有为遵循模板而增加不必要的章节、列表、表格或短句化。
+- Requested Objectives have been addressed in the corresponding Deliverables;
+- hard requirements have been satisfied, and any unsatisfied soft requirements have yielded to factual accuracy, information fidelity, or higher-priority requirements;
+- unresolved, conflict, scope, hedges, and attribution in Raw Material have not been eliminated without basis;
+- important relations and hard constraints in the Dependency Graph can be recovered from the final text;
+- the Writing Style Map has not overridden decisions made by Structure;
+- the Prose Rewrite has not introduced new content claims or damaged terminology or qualifications;
+- the output form is proportionate to the actual logical complexity and does not add unnecessary sections, lists, tables, or short-sentence fragmentation merely to comply with a template.
