@@ -4,7 +4,7 @@
 
 本系统只控制自然语言输出的任务识别、信息交接、结构重建、写作方式选择和 prose realization。检索、计算、推理与 agent 协作负责产生内容；本 Skill 只规定它们与写作流程的接口。
 
-本文是架构，不是最终 `SKILL.md`。`architecture-revised.md` 保留为上一轮批注记录。
+本文是架构，不是最终 `SKILL.md`。`project-notes/architecture-revised.md` 保留为上一轮批注记录。
 
 参考：本项目已确认的范围；`academic-writing-skills/skills/academic-writing-skills/SKILL.md` 的 “Route the Task” 与 lifecycle/overlay 分离。
 

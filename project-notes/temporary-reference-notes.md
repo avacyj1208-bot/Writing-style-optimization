@@ -8,7 +8,7 @@ The following source records were moved from `prose.md`. They preserve the sourc
 
 ### 1. Role and Boundary
 
-Sources: `writing-style-optimization/SKILL.md`, Prose; `architecture.md`, §6; [sciwrite/SKILL.md](https://github.com/labarba/sciwrite/blob/main/SKILL.md), Purpose; [blader/humanizer/SKILL.md](https://github.com/blader/humanizer/blob/main/SKILL.md), How to work.
+Sources: `writing-style-optimization/SKILL.md`, Prose; `project-notes/architecture.md`, §6; [sciwrite/SKILL.md](https://github.com/labarba/sciwrite/blob/main/SKILL.md), Purpose; [blader/humanizer/SKILL.md](https://github.com/blader/humanizer/blob/main/SKILL.md), How to work.
 
 ### 2. Inputs and Style Application
 
