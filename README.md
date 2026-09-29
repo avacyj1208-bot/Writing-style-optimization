@@ -1,6 +1,6 @@
 # Writing Style Optimization
 
-Writing Style Optimization 是一个面向自然语言交付物的 Codex Skill。它处理的不是孤立的“润色”步骤，而是从任务识别到最终成文的完整输出流程：识别用户真正要求的结果，组织检索、计算、分析等外部工作，将结果重建为可解释的语义结构，选择适合当前读者与交付形式的写作方式，最后完成受约束的 Prose Rewrite。
+Writing Style Optimization 是一个面向自然语言交付物的 Skill。与传统的润色文本方案不同，本项目控制了从任务识别到最终成文的完整输出流程：识别用户真正要求的结果，组织检索、计算、分析等外部工作，将结果重建为可解释的语义结构，选择适合当前读者与交付形式的写作方式，最后完成受约束的 Prose Rewrite。
 
 本 README 用于说明项目定位、运行流程和文件组织。正式运行规则以 [`writing-style-optimization/SKILL.md`](writing-style-optimization/SKILL.md) 及其直接加载的 `references/`、`transforms/` 文件为准；如 README 与运行时文件出现不一致，应以运行时文件为准。
 
@@ -23,14 +23,15 @@ Writing Style Optimization 是一个面向自然语言交付物的 Codex Skill�
 
 流程严格区分六类核心 artifact：
 
-| Artifact | 作用 | 负责阶段 |
-|---|---|---|
-| Task Contract | 定义用户要求完成什么、需要哪些内部工作、输入如何使用，以及最终交付物的边界 | Analyze Prompt |
-| Raw Material | 保存通过 External Work Gate 的结果及其来源、链接、限定和未解决状态 | External Work |
-| Dependency Graph | 表示 Semantic Units 之间的语义关系及 hard presentation constraints | Structure：Graph Construction |
-| Linearized Structure Draft | 将 Graph 转换为具有 Presentation Order、Semantic Grouping 和 Relation Realization 的基本通顺文本 | Structure：Linearization |
-| Writing Style Map | 为 Deliverable 和既有 Semantic Units / Groups 指定 Language Profile、Surface Realization 与可选 transform | Writing Style Selection |
-| Final Output | 通过 Prose Gate 和最终交付检查的实际文本 | Prose |
+
+| Artifact                   | 作用                                                                                                      | 负责阶段                      |
+| -------------------------- | --------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| Task Contract              | 定义用户要求完成什么、需要哪些内部工作、输入如何使用，以及最终交付物的边界                                | Analyze Prompt                |
+| Raw Material               | 保存通过 External Work Gate 的结果及其来源、链接、限定和未解决状态                                        | External Work                 |
+| Dependency Graph           | 表示 Semantic Units 之间的语义关系及 hard presentation constraints                                        | Structure：Graph Construction |
+| Linearized Structure Draft | 将 Graph 转换为具有 Presentation Order、Semantic Grouping 和 Relation Realization 的基本通顺文本          | Structure：Linearization      |
+| Writing Style Map          | 为 Deliverable 和既有 Semantic Units / Groups 指定 Language Profile、Surface Realization 与可选 transform | Writing Style Selection       |
+| Final Output               | 通过 Prose Gate 和最终交付检查的实际文本                                                                  | Prose                         |
 
 每个阶段只修改自己负责的 artifact。后续阶段不得用“改善表达”为理由重做上游决策，也不得丢失已经建立的事实、scope、hedges、attribution、inference boundary、conflict states 或技术术语。
 
@@ -185,12 +186,13 @@ Writing Style Selection 接收已经通过 Structure Gate 的 Linearized Structu
 
 Active Transforms Index 当前包含四类 transform：
 
-| Transform | 触发条件 | 适用范围 |
-|---|---|---|
-| `academic` | 读者需要评估研究 claims、evidence、inference scope 或 scholarly attribution | 整个 academic Deliverable，或主要功能为评估研究 claims 的 Semantic Groups |
-| `procedural` | 读者需要在明确条件下执行动作并识别结果 | 主要功能为呈现 conditions、actions 和 results 的 Semantic Groups |
-| `lookup-reference` | 读者需要借助稳定 lookup key 进行选择性、非线性检索，并能局部理解各 entry | 同时具有 nonlinear access、stable lookup key 和 independently interpretable entries 的 Semantic Groups |
-| `architecture` | 读者需要理解 components、dependencies、workflows、constraints 或 design rationale | 主要功能为解释系统组成及其关系的 Semantic Groups |
+
+| Transform          | 触发条件                                                                          | 适用范围                                                                                               |
+| ------------------ | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `academic`         | 读者需要评估研究 claims、evidence、inference scope 或 scholarly attribution       | 整个 academic Deliverable，或主要功能为评估研究 claims 的 Semantic Groups                              |
+| `procedural`       | 读者需要在明确条件下执行动作并识别结果                                            | 主要功能为呈现 conditions、actions 和 results 的 Semantic Groups                                       |
+| `lookup-reference` | 读者需要借助稳定 lookup key 进行选择性、非线性检索，并能局部理解各 entry          | 同时具有 nonlinear access、stable lookup key 和 independently interpretable entries 的 Semantic Groups |
+| `architecture`     | 读者需要理解 components、dependencies、workflows、constraints 或 design rationale | 主要功能为解释系统组成及其关系的 Semantic Groups                                                       |
 
 Writing Style Selection 只读取 Index 中的 category、trigger features、applicable scope 和 file path，不读取 transform 正文。每个 Semantic Unit 最终使用 Default Style 或恰好一个 selected transform；不同 transforms 的 override scopes 必须互不重叠。无法确定主要 reader function 时，保留 Default Style。
 
