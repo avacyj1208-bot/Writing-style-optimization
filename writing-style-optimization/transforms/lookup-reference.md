@@ -99,13 +99,3 @@ An entry may rely on its current heading, column headings, and clearly applicabl
 > **Full shade**
 >
 > Generally requires fewer than three hours of direct sunlight per day. Full shade still requires indirect or filtered light; it does not mean complete darkness.
-
----
-
-**Temporary references for draft review**
-
-- **Section 1:** `writing-style-optimization/references/prose.md`, Inputs and Style Application and Rewrite Constraints; `writing-style-optimization/references/writing-style-selection.md`, Active Transforms Index and Special Transform. These establish the application scope and inherited constraints.
-- **Section 2.1:** [Diataxis — Reference](https://diataxis.fr/reference/), Reference as description, Describe and only describe, and The language of reference guides; [Google — API reference comments](https://developers.google.com/style/api-reference-comments), Classes, interfaces, structs, Members, and Methods. Adapted to descriptive entry language and direct opening descriptions; API-specific documentation schemas are not adopted.
-- **Section 2.2:** [SimpleEnglish/skills/simple-english/SKILL.md](https://github.com/AminBlg/SimpleEnglish/blob/main/skills/simple-english/SKILL.md), The Document, item 9; [Google — API reference comments](https://developers.google.com/style/api-reference-comments), Parameters, Return values, and Exceptions. Adapted to explicit referents and locally interpretable conditions and values, without adding missing content or imposing definition-length limits.
-- **Section 2.3:** [Google — Lists](https://developers.google.com/style/lists), Parallel syntax, Description lists, and Description lists that use run-in headings; [Diataxis — Reference](https://diataxis.fr/reference/), Adopt standard patterns. Adapted to parallel wording and compact descriptions within the already assigned Surface Realization, not to list selection or document organization.
-- **Examples:** The three Before/After pairs are illustrative reference entries drawn from unrelated domains. They demonstrate the approved rules and are not source quotations. Entry boundaries, order, conditions, and substantive details are retained across each pair.

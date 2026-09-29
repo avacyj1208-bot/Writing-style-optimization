@@ -1,40 +1,40 @@
-# Analyze Prompt 与 External Work
+# Analyze Prompt and External Work
 
 ## 1. Role and Boundary
 
-本文件由 `SKILL.md` 在 Analyze Prompt 和 External Work 阶段加载。它接收用户输入及相关上下文，生成 Task Contract，并将 External Agents / Tools 产生的 Work Results 整理为 Raw Material。
+This file is loaded by `SKILL.md` during the Analyze Prompt and External Work stages. It receives the user input and relevant context, produces the Task Contract, and organizes the Work Results produced by External Agents / Tools into Raw Material.
 
-Analyze Prompt 形成 Task Contract，并通过 Model I 进入 Derived Work Plan；External Work 使用 Model II，由 External Work Gate 检查 Work Results，Pass 后形成 Raw Material，Fail 则返回 External Work。
+Analyze Prompt forms the Task Contract and proceeds to the Derived Work Plan through Model I. External Work uses Model II: the External Work Gate checks Work Results; Pass forms Raw Material, and Fail returns to External Work.
 
-本阶段只定义任务、输入、内部工作及其结果，不定义段落或语义结构。检索、计算、推理、文本分析、比较、核验、内容转换和多结果综合等具体工作交由 External Agents / Tools 执行。本阶段不得提前执行 Structure、Writing Style Selection 或 Prose 的工作。
+This stage defines only the task, inputs, internal work, and its results; it does not define paragraph or semantic structure. External Agents / Tools perform the specific work, including retrieval, calculation, reasoning, text analysis, comparison, verification, content transformation, and synthesis of multiple results. This stage must not perform the work of Structure, Writing Style Selection, or Prose in advance.
 
 ## 2. Input Contract
 
-Analyze Prompt 接收用户消息及其有效上下文。它必须区分需要完成的任务与作为任务输入的参考信息，并识别最终输出必须完成的内容。
+Analyze Prompt receives the user message and its valid context. It must distinguish tasks to be completed from reference information used as task input, and identify what the final output must accomplish.
 
-External Work 接收 Analyze Prompt 形成的 Task Contract，并根据其中的 Derived Work Items、required results、Task Relations、Structure Readiness Conditions 和 Input Inventory 组织 Derived Work Plan。
+External Work receives the Task Contract formed by Analyze Prompt and uses its Derived Work Items, required results, Task Relations, Structure Readiness Conditions, and Input Inventory to organize the Derived Work Plan.
 
 ## 3. Output Contract
 
-本阶段形成两个核心 artifact：
+This stage forms two core artifacts:
 
-- **Task Contract**：定义任务及其输入，由 Problem Specification 与 Context Specification 组成；
-- **Raw Material**：Work Results 经过 External Work Gate 检查后形成的离散无序结果集合。
+- **Task Contract**: defines the task and its inputs, and consists of the Problem Specification and Context Specification;
+- **Raw Material**: the discrete, unordered set of results formed after Work Results have gone through the External Work Gate.
 
-Task Contract 驱动 Derived Work Plan、Work Results 和 External Work Gate。External Work Gate 结束后，Raw Material 交给 Structure；其中保留 Generation Lineage、Work Item Links、Objective Links，以及 unresolved、conflict、scope、hedges、attribution、inference boundary 和技术术语等已有状态。
+The Task Contract drives the Derived Work Plan, Work Results, and External Work Gate. After the External Work Gate finishes, Raw Material is passed to Structure. It preserves Generation Lineage, Work Item Links, Objective Links, and existing states such as unresolved, conflict, scope, hedges, attribution, inference boundary, and technical terms.
 
 ## 4. Artifact Definitions
 
-以下表格使用四类值域：
+The following tables use four types of value domains:
 
-- **Identifier / Links**：本次 Task Contract 内的稳定标识或对既有对象的引用；
-- **Closed**：只能使用表中列出的值；
-- **Controlled**：优先使用已定义标签；现有标签无法准确表达时，使用简短的任务内标签并同时说明其含义；
-- **Open**：根据当前任务填写，不受固定标签集合限制。
+- **Identifier / Links**: a stable identifier within the current Task Contract or a reference to an existing object;
+- **Closed**: only values listed in the table may be used;
+- **Controlled**: use defined labels when possible; when existing labels cannot express the meaning accurately, use a short task-local label and explain its meaning;
+- **Open**: fill according to the current task, without restriction to a fixed label set.
 
 ### 4.1 Task Contract
 
-Analyze Prompt 识别最终输出必须完成什么，并形成 Task Contract。Task Contract 只定义任务及其输入，不定义段落或语义结构：
+Analyze Prompt identifies what the final output must accomplish and forms the Task Contract. The Task Contract defines only the task and its inputs; it does not define paragraph or semantic structure:
 
 ```text
 Task Contract
@@ -54,232 +54,223 @@ Task Contract
 
 #### Requested Objectives
 
-`Requested Objective` 是最终回复必须实现的用户可见内容结果。它说明需要回答、判断、解释、修改或产生什么，但不规定求解方法、内部工作步骤或输出结构。Objective 应保持足够通用，使 AI 能自行分析和拆解任务。
+A `Requested Objective` is a user-visible content outcome that the final response must achieve. It states what must be answered, judged, explained, modified, or produced, but does not prescribe the solution method, internal work steps, or output structure. An Objective should remain general enough for the AI to analyze and decompose the task independently.
 
 #### Derived Work Items
 
-`Derived Work Item` 是为完成一个或多个 Requested Objectives 而产生的、可以独立执行并返回结果的内部工作单元。它采用开放定义，不使用封闭的任务 taxonomy；文本分析、外部检索、计算、比较、核验、内容转换和多结果综合只作为可能实例。
+A `Derived Work Item` is an internal unit of work created to complete one or more Requested Objectives and capable of being executed independently and returning a result. It uses an open definition rather than a closed task taxonomy; text analysis, external retrieval, calculation, comparison, verification, content transformation, and synthesis of multiple results are only possible examples.
 
-每个 Derived Work Item 记录：
+Each Derived Work Item records:
 
+| Field | Content | Value domain |
+|---|---|---|
+| `work item id` | An identifier used to refer stably to the Work Item within the current Task Contract. | Identifier |
+| `objective links` | The Requested Objectives served by creating the Work Item. | Links |
+| `operation` | The work that External Agents / Tools must perform. | Open |
+| `required result` | The result content or state that must be returned when the Work Item is complete. | Open |
 
-| 字段              | 写入内容                                                 | 值域       |
-| ----------------- | -------------------------------------------------------- | ---------- |
-| `work item id`    | 当前 Task Contract 内用于稳定引用该 Work Item 的标识符。 | Identifier |
-| `objective links` | 产生该 Work Item 所服务的 Requested Objectives。         | Links      |
-| `operation`       | External Agents / Tools 需要执行的工作。                 | Open       |
-| `required result` | 该 Work Item 完成后必须返回的结果内容或状态。            | Open       |
-
-Derived Work Item 不自动成为最终输出的章节或组成部分。
+A Derived Work Item does not automatically become a section or component of the final output.
 
 #### Structure Readiness Conditions
 
-每个 Requested Objective 有一个 Structure Readiness Condition。它位于 Derived Work Items 之后，记录该 Objective 下的内部工作是否已经产生结果，并作为 External Work Gate 的 Coverage 检查依据。
+Each Requested Objective has one Structure Readiness Condition. It follows the Derived Work Items, records whether the internal work under that Objective has produced results, and serves as the basis for the Coverage check in the External Work Gate.
 
-对 Objective $O_i$，设 $W(O_i)$ 为链接到它的 Derived Work Items，$R$ 为当前 Work Results：
+For Objective $O_i$, let $W(O_i)$ be the Derived Work Items linked to it and let $R$ be the current Work Results:
 
 $$
 C_i=\bigwedge_{w\in W(O_i)}\exists r\in R:\;w\in\operatorname{WorkItemLinks}(r).
 $$
 
-每个 Condition 记录：
+Each Condition records:
 
+| Field | Content | Value domain |
+|---|---|---|
+| `objective link` | The Requested Objective checked by the Condition. | Links |
+| `state` | Whether every established Work Item under that Objective has a corresponding Work Result. | Closed:`true / false` |
 
-| 字段             | 写入内容                                                          | 值域                  |
-| ---------------- | ----------------------------------------------------------------- | --------------------- |
-| `objective link` | 该 Condition 所检查的 Requested Objective。                       | Links                 |
-| `state`          | 该 Objective 下所有既定 Work Items 是否均已有对应的 Work Result。 | Closed:`true / false` |
-
-Condition 不重复 Work Result 的内容。达到 retry 上限后生成的 Unresolved Work Result 也属于 Work Result，可以关闭相应 Work Item 的记录缺口。Condition 为 true 只表示该 Objective 的所有既定 Work Items 均已有结果状态，不表示 Objective 已在最终输出中完成，也不替代 Gate 的全局 Sufficiency Check。
+A Condition does not repeat the content of Work Results. An Unresolved Work Result produced after the retry limit is reached also counts as a Work Result and can close the corresponding Work Item's record gap. A true Condition means only that every established Work Item under the Objective has a result state; it does not mean that the Objective is complete in the final output or replace the Gate's global Sufficiency Check.
 
 #### Task Relations
 
-Task Relations 只表示 Derived Work Items 之间的执行与组织关系。内容本身的语义关系由 Structure 阶段处理。
+Task Relations represent only execution and organizational relations among Derived Work Items. Structure handles semantic relations within the content itself.
 
+| Relation | Meaning |
+|---|---|
+| `containment` | The work scope of one Work Item contains another Work Item. |
+| `dependency` | The execution or required result of one Work Item depends on the result of another Work Item. |
+| `parallel` | Multiple Work Items must all be executed, but have no result dependency or mandatory order among them. |
+| `shared-input` | Multiple Work Items use the same input but do not form result dependencies among themselves. |
+| `conflict` | The execution requirements or expected results of multiple Work Items cannot all hold simultaneously, requiring the conflict to be preserved or a choice to be made. |
+| `alternative` | Multiple Work Items are alternative paths to the same required result. |
 
-| Relation       | 含义                                                                       |
-| -------------- | -------------------------------------------------------------------------- |
-| `containment`  | 一个 Work Item 的工作范围包含另一个 Work Item。                            |
-| `dependency`   | 一个 Work Item 的执行或 required result 依赖另一个 Work Item 的结果。      |
-| `parallel`     | 多个 Work Items 均需执行，但彼此没有结果依赖或强制先后关系。               |
-| `shared-input` | 多个 Work Items 使用同一输入，但彼此不构成结果依赖。                       |
-| `conflict`     | 多个 Work Items 的执行要求或预期结果不能同时成立，需要保留冲突或作出选择。 |
-| `alternative`  | 多个 Work Items 是获得同一 required result 的替代路径。                    |
-
-这些 relation labels 属于 Controlled 值域。
+These relation labels belong to the Controlled value domain.
 
 #### Requirement Routing
 
-Analyze Prompt 识别完成任务时需要遵循的 requirements，并将其路由给实际负责的阶段。每项 requirement 记录：
+Analyze Prompt identifies the requirements that must be followed to complete the task and routes them to the stages responsible for them. Each requirement records:
 
+| Field | Content | Value domain |
+|---|---|---|
+| `requirement` | A specific condition that must be satisfied when completing the related Objectives. | Open |
+| `strength` | The binding force of the requirement on the target stages. | Closed:`hard / soft` |
+| `target stages` | The stages responsible for implementing and checking the requirement; it may refer to one or more stages. | Closed:`External Work / Structure / Writing Style Selection / Prose / final delivery check` |
+| `objective links` | The Requested Objectives constrained by the requirement. | Links |
 
-| 字段              | 写入内容                                                      | 值域                                                                                        |
-| ----------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| `requirement`     | 完成相关 Objectives 时需要满足的具体条件。                    | Open                                                                                        |
-| `strength`        | 该 requirement 对目标阶段的约束强度。                         | Closed:`hard / soft`                                                                        |
-| `target stages`   | 负责落实并检查该 requirement 的阶段；可以指向一个或多个阶段。 | Closed:`External Work / Structure / Writing Style Selection / Prose / final delivery check` |
-| `objective links` | 该 requirement 所约束的 Requested Objectives。                | Links                                                                                       |
+A `hard` requirement must be satisfied; failure to satisfy it causes the Gate of the target stage to fail. A `soft` requirement is an optimization objective and may yield when it conflicts with a hard requirement, factual accuracy, or information preservation. Analyze Prompt derives requirements from the user input and context and determines their strength; no separate `source` label is retained.
 
-`hard` requirement 必须满足；不满足会使目标阶段的 Gate 失败。`soft` requirement 是优化目标，在与 hard requirement、事实准确性或信息保真冲突时可以让步。Requirement 的来源解释和 strength 判断由 Analyze Prompt 完成，不保留独立 `source` 标签。
+A requirement is routed to External Work, Structure, Writing Style Selection, Prose, or the final delivery check according to its function. A style requirement explicitly specified by the user must be recorded here and passed to Writing Style Selection, but Analyze Prompt does not apply that style.
 
-Requirement 根据作用被路由至 External Work、Structure、Writing Style Selection、Prose 或最终交付检查。用户明确指定的文体要求必须在这里记录并传给 Writing Style Selection，但 Analyze Prompt 不执行该文体。
+#### Deliverables and Deliverable Contract
 
-#### Deliverables 与 Deliverable Contract
+A Deliverable Contract belongs to an actual `Deliverable`, not to an Objective or Work Item. An Objective defines the content outcome that must be achieved; a Work Item defines internal solution work; a Deliverable defines the external work product that carries one or more Objectives.
 
-Deliverable Contract 属于实际 `Deliverable`，不属于 Objective 或 Work Item。Objective 定义需要实现的内容结果；Work Item 定义内部求解工作；Deliverable 定义承载一个或多个 Objectives 的外部交付物。
+Objectives with the same `artifact / audience / carrier / granularity` share one Deliverable. Create multiple Deliverables only when the user requests multiple independent files, revision outputs, or other outputs. Each Deliverable Contract records:
 
-具有相同 `artifact / audience / carrier / granularity` 的 Objectives 共用一个 Deliverable。只有用户要求多个独立文件、修改结果或其他输出时，才建立多个 Deliverables。每个 Deliverable Contract 记录：
+| Field | Content | Value domain |
+|---|---|---|
+| `deliverable id` | An identifier used to refer stably to the Deliverable within the current Task Contract. | Identifier |
+| `objective links` | The Requested Objectives carried by the Deliverable. | Links |
+| `artifact` | The functional category of the deliverable as a work product, excluding file format or delivery channel. This field may use a task-appropriate label such as `response`, `assessment`, `report`, or `revised text`. | Open; examples are non-exhaustive |
+| `audience` | The intended readers or users of the Deliverable, identified from the user input and context. | Open |
+| `carrier` | The medium in which the Deliverable is actually presented or delivered, such as the current conversation, a Markdown file, or an existing document. | Open; examples are non-exhaustive |
+| `granularity` | The scope and level of detail that the Deliverable must cover. | Open |
+| `explicit deliverable slots` | Visible components that the user explicitly requires in the Deliverable; omit when none are explicitly required. | Open; optional |
 
+`artifact` does not repeat the content of an Objective. `explicit deliverable slots` do not determine completion of an Objective.
 
-| 字段                         | 写入内容                                                                                                                                         | 值域             |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------- |
-| `deliverable id`             | 当前 Task Contract 内用于稳定引用该 Deliverable 的标识符。                                                                                       | Identifier       |
-| `objective links`            | 由该 Deliverable 承载的 Requested Objectives。                                                                                                   | Links            |
-| `artifact`                   | 交付物作为工作成果的功能类别，不记录文件格式或交付渠道。该字段可以使用与任务相符的标签，如`response`、`assessment`、`report` 或 `revised text`。 | Open；示例非穷尽 |
-| `audience`                   | 该 Deliverable 的预期读者或使用者，根据用户输入及上下文识别。                                                                                    | Open             |
-| `carrier`                    | 交付物实际呈现或交付的载体，如当前对话、Markdown 文件或既有文档。                                                                                | Open；示例非穷尽 |
-| `granularity`                | 交付物需要覆盖的范围及细化程度。                                                                                                                 | Open             |
-| `explicit deliverable slots` | 用户明确要求在交付物中出现的可见组成部分；没有明确要求时省略。                                                                                   | Open；optional   |
-
-`artifact` 不重复 Objective 的内容。`explicit deliverable slots` 不承担 Objective 的完成判定。
-
-用户未指定交付形态时，默认只建立一个 Deliverable：当前对话中的 response，服务全部 user-facing Objectives，granularity 与任务复杂度相称。
+When the user does not specify a delivery form, create only one Deliverable by default: a response in the current conversation that serves all user-facing Objectives, with granularity proportional to task complexity.
 
 ### 4.3 Context Specification
 
-Context Specification 只负责区分用户输入中的任务与参考信息。它通过 Input Inventory 记录各项输入：
+Context Specification only distinguishes tasks in the user input from reference information. It records each input through the Input Inventory:
 
+| Field | Content | Value domain |
+|---|---|---|
+| `input item or pointer` | Specific content used as task input, or a reference that locates that content. | Open |
+| `role` | The function of the input in completing the related Objectives. | Controlled |
+| `authority` | The extent to which the model may rely on the input when completing the task. | Controlled |
+| `objective links` | The Requested Objectives directly served or affected by the input. | Links |
 
-| 字段                    | 写入内容                                         | 值域       |
-| ----------------------- | ------------------------------------------------ | ---------- |
-| `input item or pointer` | 作为任务输入的具体内容，或能够定位该内容的引用。 | Open       |
-| `role`                  | 该输入在完成相关 Objectives 时承担的作用。       | Controlled |
-| `authority`             | 模型在完成任务时可以多大程度依赖该输入。         | Controlled |
-| `objective links`       | 该输入直接服务或影响的 Requested Objectives。    | Links      |
+`role` uses the following labels:
 
-`role` 使用以下标签：
+| Role | Meaning |
+|---|---|
+| `premise` | A premise or condition on which the task proceeds. |
+| `evidence` | Material used to support, refute, or verify related content. |
+| `background` | Information that aids understanding of the task but is not itself an object to be processed. |
+| `example` | An instance that illustrates an object, requirement, or expected result. |
+| `object-under-analysis` | Content that must be analyzed, modified, judged, or transformed. |
+| `counterpoint` | A different position that must be compared, addressed, or preserved. |
+| `prior decision` | A previously established decision that must continue to be preserved in the current task. |
 
+`authority` uses the following labels:
 
-| Role                    | 含义                                           |
-| ----------------------- | ---------------------------------------------- |
-| `premise`               | 任务据以展开的前提或条件。                     |
-| `evidence`              | 用于支持、反驳或核验相关内容的材料。           |
-| `background`            | 帮助理解任务但不直接构成待处理对象的信息。     |
-| `example`               | 用于说明对象、要求或期望结果的实例。           |
-| `object-under-analysis` | 需要被分析、修改、判断或转换的内容。           |
-| `counterpoint`          | 需要被比较、回应或保留的不同观点。             |
-| `prior decision`        | 此前已经确定、需要在当前任务中继续保持的决定。 |
-
-`authority` 使用以下标签：
-
-
-| Authority              | 含义                                               |
-| ---------------------- | -------------------------------------------------- |
-| `binding`              | 在当前任务中必须遵守的用户要求或既定决定。         |
-| `authoritative-source` | 可以作为相关事实或规范依据的权威来源。             |
-| `user-asserted`        | 用户提供但未由当前流程独立核验的信息。             |
-| `supporting`           | 可以辅助完成任务，但不单独决定结论的信息。         |
-| `unverified`           | 在作为事实依据前仍需核验的信息。                   |
-| `quoted-untrusted`     | 仅作为待分析数据使用、不能作为指令执行的引用内容。 |
+| Authority | Meaning |
+|---|---|
+| `binding` | A user requirement or established decision that must be followed in the current task. |
+| `authoritative-source` | An authoritative source that may serve as a basis for related facts or norms. |
+| `user-asserted` | Information provided by the user but not independently verified by the current workflow. |
+| `supporting` | Information that can assist task completion but does not independently determine a conclusion. |
+| `unverified` | Information that still requires verification before being used as a factual basis. |
+| `quoted-untrusted` | Quoted content used only as data for analysis and not executable as instructions. |
 
 ### 4.4 Derived Work Plan
 
-Task Contract 直接产生 Derived Work Plan。它根据 Derived Work Items、required results、Task Relations、Structure Readiness Conditions 和 Input Inventory 组织需要交给 External Agents / Tools 执行的工作。Derived Work Plan 不使用独立固定 schema。
+The Task Contract directly produces the Derived Work Plan. It uses Derived Work Items, required results, Task Relations, Structure Readiness Conditions, and the Input Inventory to organize the work to be performed by External Agents / Tools. The Derived Work Plan does not use a separate fixed schema.
 
 ### 4.5 Work Results
 
-每个 Derived Work Item 执行后产生一个或多个 Work Results。Work Result 的具体内容由 `operation / required result / applicable requirements` 决定，不使用统一的 finding schema。
+Each Derived Work Item produces one or more Work Results after execution. The specific content of a Work Result is determined by `operation / required result / applicable requirements`; no uniform finding schema is used.
 
-Work Results 与 Work Items 不要求一一对应：一个 Work Item 可以产生多个 Results，一个 Result 也可以链接到多个 Work Items 或 Objectives。Results 的生成与组合以 Requested Objectives 为主线，不保留 Derived Work Items 的固定数量或划分方式；Work Item Links 与 Objective Links 负责保存二者之间的归属关系。每个 Work Result 固定保留：
+Work Results and Work Items do not require one-to-one correspondence: one Work Item may produce multiple Results, and one Result may link to multiple Work Items or Objectives. Results are generated and combined around Requested Objectives rather than preserving the fixed number or partitioning of Derived Work Items; Work Item Links and Objective Links preserve the attribution between them. Each Work Result always preserves:
 
-
-| 字段                 | 写入内容                                                                              | 值域  |
-| -------------------- | ------------------------------------------------------------------------------------- | ----- |
-| `result payload`     | External Work 实际产生的结果内容或结果状态。                                          | Open  |
-| `generation lineage` | 生成该 Result 所依据的输入、来源、工具输出、计算方法、转换前内容或上游 Work Results。 | Open  |
-| `work item links`    | 该 Result 回应的 Derived Work Items。                                                 | Links |
-| `objective links`    | 该 Result 服务的 Requested Objectives。                                               | Links |
+| Field | Content | Value domain |
+|---|---|---|
+| `result payload` | The result content or result state actually produced by External Work. | Open |
+| `generation lineage` | The inputs, sources, tool outputs, calculation methods, pre-transformation content, or upstream Work Results on which the Result is based. | Open |
+| `work item links` | The Derived Work Items addressed by the Result. | Links |
+| `objective links` | The Requested Objectives served by the Result. | Links |
 
 ### 4.6 Raw Material
 
-Raw Material 是全部 Work Results 结束 External Work Gate 后形成的、带有 Generation Lineage、Work Item Links 和 Objective Links 的离散无序结果集合。它可以包含分析、检索、计算、比较、核验、转换、综合和 Unresolved Work Results。
+Raw Material is the discrete, unordered set of all Work Results formed after the External Work Gate finishes, with Generation Lineage, Work Item Links, and Objective Links. It may contain analysis, retrieval, calculation, comparison, verification, transformation, synthesis, and Unresolved Work Results.
 
-这里的“无序”只表示尚未形成 Dependency Graph 或 Presentation Order；已有 links 只承担 Traceability 与 Attribution，不构成 semantic graph。Raw Material 尚未建立 semantic relations、Dependency Graph、Presentation Order、paragraph functions 或 writing style。
+Here, “unordered” means only that no Dependency Graph or Presentation Order has been formed. Existing links serve only Traceability and Attribution; they do not constitute a semantic graph. Raw Material has not established semantic relations, a Dependency Graph, Presentation Order, paragraph functions, or writing style.
 
 ## 5. Procedure
 
 ### 5.1 Analyze Prompt
 
-1. 从用户输入中识别 Requested Objectives。
-2. 根据 Objectives 拆分 Derived Work Items，并记录其 objective links、operation 和 required result。
-3. 为每个 Objective 建立 Structure Readiness Condition。
-4. 记录 Work Items 之间的 Task Relations。
-5. 识别 requirements，并记录 strength、target stages 和 objective links。
-6. 根据实际交付物建立 Deliverables 及其 Deliverable Contracts。
-7. 区分任务与参考信息，建立 Context Specification 的 Input Inventory。
+1. Identify Requested Objectives from the user input.
+2. Derive the necessary Work Items from the Objectives and record their objective links, operation, and required result.
+3. Establish a Structure Readiness Condition for each Objective.
+4. Record Task Relations among Work Items.
+5. Identify requirements and record their strength, target stages, and objective links.
+6. Establish Deliverables and their Deliverable Contracts according to the actual work products.
+7. Distinguish tasks from reference information and build the Input Inventory of the Context Specification.
 
 ### 5.2 Build the Derived Work Plan
 
-根据 Derived Work Items、required results、Task Relations、Structure Readiness Conditions 和 Input Inventory 生成 Derived Work Plan，并交给 External Agents / Tools 执行。
+Generate the Derived Work Plan from Derived Work Items, required results, Task Relations, Structure Readiness Conditions, and the Input Inventory, and pass it to External Agents / Tools for execution.
 
 ### 5.3 Collect Work Results
 
-接收 External Agents / Tools 返回的 Work Results。每个 Result 保留其 result payload、generation lineage、work item links 和 objective links。
+Receive the Work Results returned by External Agents / Tools. Each Result preserves its result payload, generation lineage, work item links, and objective links.
 
 ### 5.4 Run the External Work Gate
 
-按照 Coverage、Requirement Compliance、Traceability、Sufficiency 的顺序检查 Work Results。局部检查失败时只重做对应 Work Items；达到 retry 上限后生成 Unresolved Work Result。
+Check Work Results in the order Coverage, Requirement Compliance, Traceability, and Sufficiency. When a local check fails, redo only the corresponding Work Items; after the retry limit is reached, produce an Unresolved Work Result.
 
 ### 5.5 Form Raw Material
 
-将通过检查的 Work Results 与达到局部 retry 上限后形成的 Unresolved Work Results 一并整理为 Raw Material，并保留各 Result 已有的 lineage、links、限定和状态。
+Organize Work Results that pass the checks together with Unresolved Work Results formed after the local retry limit is reached into Raw Material, preserving each Result's existing lineage, links, qualifications, and states.
 
 ## 6. External Work Gate
 
-External Work Gate 依次执行三项局部检查和一项全局检查。
+The External Work Gate performs three local checks followed by one global check.
 
 ### 6.1 Coverage
 
-按 Objective 检查 Structure Readiness Condition：该 Objective 下每个既定 Work Item 是否至少已有一个链接到它的 Work Result。
+Check the Structure Readiness Condition by Objective: whether every established Work Item under that Objective has at least one Work Result linked to it.
 
 ### 6.2 Requirement Compliance
 
-检查 `target stages` 包含 External Work 的 requirements 是否满足。
+Check whether requirements whose `target stages` include External Work are satisfied.
 
 ### 6.3 Traceability
 
-对每个 Work Result 检查：
+For each Work Result, check:
 
-1. **Generation Lineage**：是否能够追溯到其输入；
-2. **Attribution**：是否保留 Work Item Links 与 Objective Links。
+1. **Generation Lineage**: whether it can be traced to its inputs;
+2. **Attribution**: whether Work Item Links and Objective Links are preserved.
 
-Traceability 追踪文本位置、来源、工具输出、计算输入与方法、转换前内容，或综合结果所依赖的 Work Results；不追踪 hidden chain of thought。冲突可以作为 Work Result 的内容状态保留，不设置独立 Conflict Check。
+Traceability tracks text locations, sources, tool outputs, calculation inputs and methods, pre-transformation content, or the Work Results on which a synthesized result depends; it does not track hidden chain of thought. A conflict may be preserved as a content state of a Work Result; no separate Conflict Check is established.
 
 ### 6.4 Sufficiency
 
-对全部 Work Results 检查：当前 Results 是否允许 Structure 在不发明新事实或新推导前提的情况下完成所有 Objectives。
+Check all Work Results collectively: whether the current Results allow Structure to complete all Objectives without inventing new facts or new derivations.
 
 ## 7. Failure Routing
 
-Gate Fail 后，只把未通过检查的对应 Work Items 重新交给 External Agents / Tools；不重新生成 Derived Work Plan，也不重复已经通过的 Work Items。
+After a Gate Fail, return only the corresponding Work Items that failed the checks to External Agents / Tools. Do not regenerate the Derived Work Plan or repeat Work Items that have already passed.
 
-每个失败 Work Item 最多执行初次尝试加四次 retry。达到上限仍未通过时，生成带有相同 Attribution 的 Unresolved Work Result，记录未完成状态并结束该项 Gate loop。流程不报错，继续形成 Raw Material。
+Each failed Work Item receives at most the initial attempt plus four retries. If it still does not pass after reaching the limit, produce an Unresolved Work Result with the same Attribution, record the incomplete state, and end that item's Gate loop. The workflow does not raise an error and continues to form Raw Material.
 
-External Work Gate Fail 只返回 External Work，不返回 Analyze Prompt，也不进入 Structure 修改内容。
+An External Work Gate Fail returns only to External Work. It does not return to Analyze Prompt or enter Structure to modify content.
 
 ## 8. Handoff
 
-External Work Gate 结束后，Raw Material 成为 External Work 直接交给 Structure 的内容 artifact。Work Results 不作为 Raw Material 之外的并行输入；需要追溯时，Structure 通过 Raw Material 中保留的 Generation Lineage、Work Item Links 和 Objective Links 定位其来源。
+After the External Work Gate finishes, Raw Material becomes the content artifact passed directly from External Work to Structure. Work Results are not provided as a parallel input outside Raw Material; when provenance must be traced, Structure locates their sources through the Generation Lineage, Work Item Links, and Objective Links preserved in Raw Material.
 
-Task Contract 作为全流程持续可索引的只读控制 artifact 保留，不在本次 Handoff 后失效，也不被复制进 Raw Material。
+The Task Contract remains a continuously indexable, read-only control artifact throughout the workflow. It does not expire after this Handoff and is not copied into Raw Material.
 
-Structure 接收 Raw Material，并从 Task Contract 中读取：
+Structure receives Raw Material and reads the following from the Task Contract:
 
-- Requested Objectives；
-- Task Relations；
-- `target stages` 包含 Structure 的 requirements；
-- Deliverable Contracts。
+- Requested Objectives;
+- Task Relations;
+- requirements whose `target stages` include Structure;
+- Deliverable Contracts.
 
-Structure 使用的 Task Contract projection 只服务本阶段，不作为 Handoff 传给下一阶段。Writing Style Selection、Prose 和最终完成检查分别从 Task Contract 读取与自身有关的 projection。
+The Task Contract projection used by Structure serves only that stage and is not passed to the next stage as part of the Handoff. Writing Style Selection, Prose, and the final completion check each read their own projection from the Task Contract.
 
-Structure 以 Raw Material 作为内容输入，以 Task Contract 的阶段 projection 作为控制输入。它不得把 Work Results 的产生顺序直接作为成文顺序，也不得消除 Raw Material 中已有的 unresolved、conflict、scope、hedges、attribution、inference boundary 或技术术语。
+Structure uses Raw Material as its content input and the stage projection of the Task Contract as its control input. It must not use the production order of Work Results directly as written order or eliminate existing unresolved, conflict, scope, hedges, attribution, inference boundary, or technical terms from Raw Material.

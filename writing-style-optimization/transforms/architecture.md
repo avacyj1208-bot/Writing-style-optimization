@@ -16,11 +16,15 @@ Work within the existing grouping, Presentation Order, and assigned Surface Real
 
 **Before:**
 
-> The ventilation system has a controller, and the controller has an important role in deciding how the fan should operate. The room sensor provides a carbon-dioxide reading every minute, and this reading is what the controller uses. When the reading exceeds the configured threshold, the controller increases the fan speed. The part concerning the window needs to be made clear: if the window is open, the controller holds the fan at its minimum speed instead. Occupancy sensing is planned for a later version, but it does not currently influence the fan speed.
+> **Lifecycle.** Candidacy is now two clocks, not one age gate. A paper competes for admission for 72 hours from announcement; once admitted it has five days **from pool entry** to win a slot. `papers.status` materializes the resulting state machine (`scoring → rejected | active → expired | shown`), recomputed rather than advanced so that widening a window returns a lapsed paper to the queue instead of stranding it, and `db.advance_lifecycle` is the single definition both stages read.
+>
+> A placed paper is written `status = 'shown'` with its date, bucket, and $p_k$, **plus one `assignment_audit` row recording why it was placed** (which policy ordered the bucket, the `V` in force and its snapshot, the parameter fingerprint, `fallback_reason` when V was not used, and which pass took it). `assign --force` overwrites the current day's audit rows and clears any that the recomputed cohort no longer contains — the same decision, revised — and may never touch an earlier date, because no stage can reconstruct one. The placed paper is excluded from every later candidate set — this is what makes the feed turn over, since a 3-day half-life would otherwise re-elect the same papers for a week. Assignment is idempotent **per day**, not per row: re-running it no-ops rather than placing a second cohort, because the candidate filter is "never assigned".
 
 **After:**
 
-> The room sensor sends a carbon-dioxide reading to the ventilation controller every minute. When the window is open, the controller holds the fan at its minimum speed; otherwise, it increases the speed when the reading exceeds the configured threshold. Occupancy sensing is planned for a later version and does not currently affect fan speed.
+> **Lifecycle.** Admission eligibility lasts 72 hours from announcement. Admission starts a separate five-day pool-residency window in which the paper can win a display slot. Both stages use `db.advance_lifecycle` to recompute `papers.status` (`scoring → rejected | active → expired | shown`), rather than advance it irreversibly; widening a window can therefore return a lapsed paper to the queue.
+>
+> Placement sets `status = 'shown'` and records the date, bucket, and $p_k$. It also writes one `assignment_audit` row containing the bucket-ordering policy, the `V` value and snapshot, the parameter fingerprint, `fallback_reason` when V was not used, and the placement pass. `assign --force` revises only the current day's assignment: it overwrites that day's audit rows and removes rows for papers absent from the recomputed cohort. Earlier dates remain unchanged because no stage can reconstruct them. Placed papers are excluded from all later candidate sets, ensuring feed turnover instead of allowing the 3-day half-life to reselect the same papers for a week. Normal reruns are no-ops for the day: applying the "never assigned" filter again to place a second cohort would violate daily idempotence.
 
 ### 2.2 Constraints and Rationale
 
@@ -30,11 +34,15 @@ Work within the existing grouping, Presentation Order, and assigned Surface Real
 
 **Before:**
 
-> The review arrangement is an important safeguard, and it is essential to understand exactly what it means. Each application is assessed independently by two reviewers. Their scores are averaged to determine its rank. There is one exception that must not be overlooked: when the scores differ by more than two points, a third reviewer assesses the application, and the median of all three scores determines its rank instead. This exception exists because averaging two sharply different assessments can conceal disagreement. Simply applying the average in every case would miss the point of the design.
+> **Seeds are deliberately absent from `papers`.**
+>
+> Keeping them out is structural rather than incidental: the assignment candidate filter is `assigned_date IS NULL`, so a seed inserted into `papers` would compete for a display slot, draw a paid summary, and be rendered. A seed is a direction anchor, not a candidate. The consequence is that seed vectors need their own embedding pass, which runs as a second phase of the `embed` stage **on the same encoder instance** — `SFF_revised.md` §2.1 fixes $E$ corpus-wide, and since `V` compares a candidate against a seed centroid, vectors from two encoder versions would be silently incomparable rather than merely imprecise.
 
 **After:**
 
-> Two reviewers independently assess each application, and the mean of their scores determines its rank. If the scores differ by more than two points, a third reviewer assesses the application, and the median of the three scores determines its rank instead. The third assessment addresses disagreement that averaging the first two scores could conceal.
+> **Seeds are deliberately absent from `papers`.**
+>
+> Seeds are direction anchors, not display candidates. Inserting them into `papers` would make them eligible under `assigned_date IS NULL`: they would compete for display slots, incur paid summaries, and be rendered. Their separate storage therefore requires a separate embedding pass, implemented as the second phase of `embed`. Both phases use the same encoder instance, preserving the corpus-wide $E$ required by `SFF_revised.md` §2.1. Since `V` compares candidate vectors with seed centroids, different encoder versions would make those vectors incomparable, not merely less precise.
 
 ### 2.3 Single-Point Exposition and Explicit References
 
@@ -48,30 +56,28 @@ Work within the existing grouping, Presentation Order, and assigned Surface Real
 
 **Before:**
 
-> **Reference period**
+> **Opening terminology**
 >
-> The reference period is the twelve complete calendar months preceding the forecast date. Months with incomplete observations are excluded, and excluded months are not replaced by earlier months. A forecast is withheld if fewer than nine months remain.
+> **Terminology confirmed by the user (2026-09-10): field and arXiv category are synonyms.** `Λ` is the selected arXiv category set, `λ` is one such category, and `Λ(i)` contains the paper's arXiv-assigned categories within that set. There is no additional category-to-field taxonomy or rollup. Candidate category membership and editorial seed-library membership are different relations over the same category identifiers (§2.10.2). Preserve existing `math.NA` / `cs.NA` alias handling; it does not create a second taxonomy.
 >
-> **Seasonal adjustment**
+> **§2.7 — Assignment**
 >
-> The seasonal adjustment component estimates its baseline from the reference period. To recall what that means, this is the twelve complete calendar months before the forecast date, excluding months with incomplete observations without replacing them with earlier months. At least nine months must remain for a forecast to be issued. The component compares the current observation with the baseline to produce a seasonally adjusted value, which is passed to the forecasting component.
+> Assignment was implementable before the rest of V2 because it needs neither Rating nor T3. Category keys already represent `λ`; they are not a substitute for a missing taxonomy.
+>
+> **§5 — Migration path and sequence**
+>
+> **Task 2 then took step 8's feedback half** (§2.10), leaving T4 rationale generation for later. It had to precede step 3 rather than follow it, because step 3's `V` upgrade consumes reference sets that did not exist: building `V` first would have meant building it against empty libraries. Its field keys are the selected arXiv categories; editorial seed assignments do not require a second taxonomy.
 
 **After:**
 
-> **Reference period**
+> **Opening terminology**
 >
-> The reference period is the twelve complete calendar months preceding the forecast date. Months with incomplete observations are excluded and are not replaced by earlier months. A forecast is withheld if fewer than nine months remain.
+> **Terminology confirmed by the user (2026-09-10): field and arXiv category are synonyms.** `Λ` is the selected arXiv category set, `λ` is one such category, and `Λ(i)` contains the paper's arXiv-assigned categories within that set. There is no additional category-to-field taxonomy or rollup. Candidate category membership and editorial seed-library membership are different relations over the same category identifiers (§2.10.2). Preserve existing `math.NA` / `cs.NA` alias handling; it does not create a second taxonomy.
 >
-> **Seasonal adjustment**
+> **§2.7 — Assignment**
 >
-> The seasonal adjustment component estimates its baseline from the reference period (see **Reference period**). It compares the current observation with this baseline and passes the resulting seasonally adjusted value to the forecasting component.
-
----
-
-**Temporary references for draft review**
-
-- **Section 1:** `writing-style-optimization/references/prose.md`, Inputs and Style Application and Rewrite Constraints; `writing-style-optimization/references/writing-style-selection.md`, Active Transforms Index and Special Transform. These establish the application scope and inherited constraints.
-- **Section 2.1:** [Diataxis — Explanation](https://diataxis.fr/explanation/), Make connections, Provide context, and Keep explanation closely bounded. Adapted to the expression of established mechanisms; no new analysis or document template is introduced.
-- **Section 2.2:** [arc42 — Architecture Decisions](https://docs.arc42.org/section-9/), Content and Motivation. Adapted to the expression of supplied decisions, reasons, and trade-offs, without adopting an ADR workflow.
-- **Section 2.3:** [arc42 — Refer to concepts, views or code](https://docs.arc42.org/tips/4-4/). The stricter single-point exposition and no-recall requirements follow the approved project discussion; arc42 supports the use of references to avoid redundant explanations. Exposition placement remains a Structure responsibility.
-- **Examples:** The three Before/After pairs are illustrative, not source quotations. They retain the supplied mechanisms, conditions, rationale, and grouping while demonstrating the approved writing rules.
+> Assignment was implementable before the rest of V2 because it needs neither Rating nor T3. It uses the category keys defined in **Opening terminology**.
+>
+> **§5 — Migration path and sequence**
+>
+> Task 2 implemented the feedback half of step 8 (§2.10), leaving T4 rationale generation for later. It had to precede step 3 because that step's `V` upgrade requires reference sets; building `V` first would have meant using empty libraries. Field keys follow **Opening terminology**, and editorial seed memberships follow §2.10.2.

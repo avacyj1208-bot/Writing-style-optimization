@@ -51,12 +51,3 @@ Use statements for system behavior, results, and explanations. These support the
 **After:**
 
 > Caution: Do not reset the device before exporting saved profiles. The reset erases them.
-
----
-
-**Temporary references for draft review**
-
-- **Section 1:** `writing-style-optimization/references/prose.md`, Inputs and Style Application and Rewrite Constraints; `writing-style-optimization/references/writing-style-selection.md`, Special Transform. These establish the application scope and inherited constraints.
-- **Section 2.1:** [SimpleEnglish/skills/simple-english/SKILL.md](https://github.com/AminBlg/SimpleEnglish/blob/main/skills/simple-english/SKILL.md), The Document, items 1, 4, and 9; [Microsoft Procedures and instructions checklist](https://learn.microsoft.com/en-us/style-guide/checklists/procedures-and-instructions-checklist), Step-by-step instructions; [Google Procedures](https://developers.google.com/style/procedures), Multi-action procedures and Steps that say where to complete a task. The imperative instruction is retained from Microsoft; the Before/After pair is reproduced from Google. Guidance on action granularity is adapted to preserve existing Semantic Units and grouping.
-- **Section 2.2:** [SimpleEnglish/skills/simple-english/SKILL.md](https://github.com/AminBlg/SimpleEnglish/blob/main/skills/simple-english/SKILL.md), The Document, item 3; [Google Prescriptive documentation](https://developers.google.com/style/prescriptive-documentation), Word choice for recommendations and requirements. The After sentence is retained from SimpleEnglish; the Before sentence reverses its clause order. Action-status guidance preserves meaning rather than adopting SimpleEnglish's modal restrictions.
-- **Section 2.3:** [Google Procedures](https://developers.google.com/style/procedures), Steps with results or justifications; [Google Prescriptive documentation](https://developers.google.com/style/prescriptive-documentation), Word choice for recommendations and requirements; [Google Notes, cautions, warnings, and other notices](https://developers.google.com/style/notices), When to use a note notice type and When not to use a note notice type; [SimpleEnglish/skills/simple-english/SKILL.md](https://github.com/AminBlg/SimpleEnglish/blob/main/skills/simple-english/SKILL.md), The Document, item 12. The warning example is illustrative, following SimpleEnglish's command-before-risk pattern; it is not a source quotation.
